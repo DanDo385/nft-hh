@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import NFTArtifact from '../artifacts/contracts/NFT.sol/NFT.json';
 import contractAddress from '../artifacts/NFT_address.json';
 
-const MintNFT = ({ provider, signer }) => {
+const MintNFT = ({ provider, signer, onMinting }) => {
   const [tokenURI, setTokenURI] = useState('');
   const [mintingStatus, setMintingStatus] = useState('');
 
@@ -17,9 +17,16 @@ const MintNFT = ({ provider, signer }) => {
       const tx = await contract.mint(tokenURI);
       await tx.wait();
       setMintingStatus('Minting successful!'); // Success message
+      if (onMinting) onMinting('Minting successful!');
     } catch (error) {
       console.error('Minting error:', error);
-      setMintingStatus(`Minting failed: ${error.message}`); // Error message
+      let errorMessage = 'Minting failed: Internal JSON-RPC error.';
+      if (error.data && error.data.message) {
+        errorMessage = `Minting failed: ${error.data.message}`;
+      } else if (error.message) {
+        errorMessage = `Minting failed: ${error.message}`;
+      }
+      setMintingStatus(errorMessage); // Error message
     }
   };
 
@@ -41,4 +48,3 @@ const MintNFT = ({ provider, signer }) => {
 };
 
 export default MintNFT;
-erro
