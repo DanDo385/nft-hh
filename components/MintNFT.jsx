@@ -1,5 +1,3 @@
-// components/MintNFT.jsx
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -47,8 +45,11 @@ const MintNFT = ({ provider, signer, onMinting }) => {
     setMintingStatus('Minting in progress...');
     try {
       const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
+      console.log('Attempting to send mint transaction', { tokenURI });
       const tx = await contract.mint(tokenURI, { gasLimit: 1000000 }); // Increased gas limit
+      console.log('Transaction sent:', tx.hash);
       await tx.wait();
+      console.log('Transaction confirmed on the blockchain');
       setMintingStatus('Minting successful!');
       if (onMinting) onMinting('Minting successful!');
     } catch (error) {
@@ -56,10 +57,12 @@ const MintNFT = ({ provider, signer, onMinting }) => {
       let errorMessage = 'Minting failed: Internal JSON-RPC error.';
       if (error.data && error.data.message) {
         errorMessage = `Minting failed: ${error.data.message}`;
+        console.error('Detailed RPC Error:', error.data.message);
       } else if (error.message) {
         errorMessage = `Minting failed: ${error.message}`;
       }
       setMintingStatus(errorMessage);
+      console.error('Detailed Error Message:', error);
     }
   };
 

@@ -13,7 +13,6 @@ export default function Home() {
   const [address, setAddress] = useState(null);
   const [lastMinted, setLastMinted] = useState(null);
 
-  const handleLogin = (provider, signer, address) => {
     const handleLogin = (provider, signer, address) => {
       console.log('Provider:', provider);
       console.log('Signer:', signer);
