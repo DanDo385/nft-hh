@@ -10,11 +10,18 @@ export default function Home() {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [address, setAddress] = useState(null);
+  const [lastMinted, setLastMinted] = useState(null);
 
   const handleLogin = (provider, signer, address) => {
     setProvider(provider);
     setSigner(signer);
     setAddress(address);
+  };
+
+  const handleMinting = (status) => {
+    if (status === 'Minting successful!') {
+      setLastMinted(Date.now());
+    }
   };
 
   return (
@@ -23,8 +30,8 @@ export default function Home() {
       {address && (
         <>
           <p>Logged in as: {address}</p>
-          <MintNFT provider={provider} signer={signer} />
-          <NFTCards provider={provider} />
+          <MintNFT provider={provider} signer={signer} onMinting={handleMinting} />
+          <NFTCards provider={provider} lastUpdate={lastMinted} />
         </>
       )}
     </div>
