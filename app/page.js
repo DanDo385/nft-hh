@@ -1,4 +1,4 @@
-// app.page.js
+// pages/index.jsx
 "use client";
 
 import React, { useState } from 'react';
