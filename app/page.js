@@ -1,5 +1,5 @@
 // pages/index.jsx
-
+"use client"
 import React, { useState } from 'react';
 import MintNFT from '../components/MintNFT';
 import LoginMetaMask from '../components/LoginMetaMask';
