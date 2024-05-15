@@ -1,4 +1,4 @@
-//components/MintNFT.jsx
+// components/MintNFT.jsx
 
 "use client";
 
@@ -15,16 +15,21 @@ const MintNFT = ({ provider, signer, onMinting }) => {
 
   useEffect(() => {
     const checkNetworkAndOwner = async () => {
-      const { chainId } = await provider.getNetwork();
-      console.log("Connected network chain ID: ", chainId);
+      try {
+        const { chainId } = await provider.getNetwork();
+        console.log("Connected network chain ID: ", chainId);
 
-      const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
-      const owner = await contract.owner();
-      const signerAddress = await signer.getAddress();
-      setIsOwner(owner.toLowerCase() === signerAddress.toLowerCase());
+        if (chainId !== correctChainId) {
+          alert('Please connect to the correct network');
+          return;
+        }
 
-      if (chainId !== correctChainId) {
-        alert('Please connect to the correct network');
+        const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
+        const owner = await contract.owner();
+        const signerAddress = await signer.getAddress();
+        setIsOwner(owner.toLowerCase() === signerAddress.toLowerCase());
+      } catch (error) {
+        console.error('Error checking network and owner:', error);
       }
     };
 
@@ -42,7 +47,7 @@ const MintNFT = ({ provider, signer, onMinting }) => {
     setMintingStatus('Minting in progress...');
     try {
       const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
-      const tx = await contract.mint(tokenURI, { gasLimit: 1000000 });
+      const tx = await contract.mint(tokenURI, { gasLimit: 1000000 }); // Increased gas limit
       await tx.wait();
       setMintingStatus('Minting successful!');
       if (onMinting) onMinting('Minting successful!');

@@ -1,4 +1,5 @@
 // components/LoginMetaMask.jsx
+
 "use client";
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
@@ -13,6 +14,14 @@ const LoginMetaMask = ({ onLogin }) => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const address = await signer.getAddress();
+        
+        // Ensure network is connected to Hardhat local network
+        const { chainId } = await provider.getNetwork();
+        if (chainId !== 31337) {
+          alert('Please switch to the Hardhat local network');
+          return;
+        }
+
         setAccount(address);
         if (onLogin) onLogin(provider, signer, address);
       } catch (error) {
