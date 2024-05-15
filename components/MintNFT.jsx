@@ -1,39 +1,39 @@
-import { useState } from "react";
-import { getContract } from "../lib/ethers";
+// components/MintNFT.jsx
 
-const MintNFT = () => {
-  const [tokenURI, setTokenURI] = useState("");
-  const [status, setStatus] = useState("");
+import React, { useState } from 'react';
+import { ethers } from 'ethers';
+import NFTArtifact from '../artifacts/contracts/NFT.sol/NFT.json';
+import contractAddress from '../artifacts/NFT_address.json';
 
-  const handleMint = async () => {
+const MintNFT = ({ provider, signer }) => {
+  const [tokenURI, setTokenURI] = useState('');
+  const [mintedTokenId, setMintedTokenId] = useState(null);
+
+  const mintNFT = async () => {
     try {
-      await window.ethereum.request({ method: "eth_requestAccounts" }); // Request wallet connection
-      const contract = getContract();
-      const transaction = await contract.mint(tokenURI);
-      await transaction.wait();
-      setStatus("NFT minted successfully");
+      const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
+      const tx = await contract.mint(tokenURI);
+      await tx.wait();
+      const tokenId = await contract.tokenCount();
+      setMintedTokenId(tokenId.toNumber());
     } catch (error) {
-      console.error(error);
-      setStatus("Error minting NFT");
+      console.error('Minting error:', error);
     }
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="p-4 border rounded shadow">
       <input
-        className="border border-gray-300 p-2 rounded"
         type="text"
         value={tokenURI}
         onChange={(e) => setTokenURI(e.target.value)}
         placeholder="Enter token URI"
+        className="input input-bordered mb-2"
       />
-      <button
-        className="bg-blue-500 text-white p-2 rounded"
-        onClick={handleMint}
-      >
+      <button onClick={mintNFT} className="btn btn-primary">
         Mint NFT
       </button>
-      <p>{status}</p>
+      {mintedTokenId !== null && <p>Minted Token ID: {mintedTokenId}</p>}
     </div>
   );
 };
