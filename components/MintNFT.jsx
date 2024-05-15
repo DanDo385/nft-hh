@@ -9,6 +9,7 @@ const MintNFT = ({ provider, signer, onMinting }) => {
   const [tokenURI, setTokenURI] = useState('');
   const [mintingStatus, setMintingStatus] = useState('');
   const [isOwner, setIsOwner] = useState(false);
+  const correctChainId = 31337; // Hardhat local network chain ID
 
   useEffect(() => {
     const checkNetworkAndOwner = async () => {
@@ -20,7 +21,7 @@ const MintNFT = ({ provider, signer, onMinting }) => {
       const signerAddress = await signer.getAddress();
       setIsOwner(owner.toLowerCase() === signerAddress.toLowerCase());
 
-      if (chainId !== your_chain_id) {
+      if (chainId !== correctChainId) {
         alert('Please connect to the correct network');
       }
     };
