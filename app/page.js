@@ -1,8 +1,10 @@
 // pages/index.jsx
-"use client"
+"use client";
+
 import React, { useState } from 'react';
 import MintNFT from '../components/MintNFT';
 import LoginMetaMask from '../components/LoginMetaMask';
+import NFTCards from '../components/NFTCards';
 
 export default function Home() {
   const [provider, setProvider] = useState(null);
@@ -22,6 +24,7 @@ export default function Home() {
         <>
           <p>Logged in as: {address}</p>
           <MintNFT provider={provider} signer={signer} />
+          <NFTCards provider={provider} />
         </>
       )}
     </div>
