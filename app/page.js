@@ -1,4 +1,4 @@
-//app/page.js
+// app/page.js
 
 "use client";
 
@@ -14,10 +14,15 @@ export default function Home() {
   const [lastMinted, setLastMinted] = useState(null);
 
   const handleLogin = (provider, signer, address) => {
-    setProvider(provider);
-    setSigner(signer);
-    setAddress(address);
-  };
+    const handleLogin = (provider, signer, address) => {
+      console.log('Provider:', provider);
+      console.log('Signer:', signer);
+      console.log('Address:', address);
+      setProvider(provider);
+      setSigner(signer);
+      setAddress(address);
+    };
+    
 
   const handleMinting = (status) => {
     if (status === 'Minting successful!') {
