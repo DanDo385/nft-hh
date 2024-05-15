@@ -1,3 +1,5 @@
+//components/MintNFT.jsx
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -40,7 +42,7 @@ const MintNFT = ({ provider, signer, onMinting }) => {
     setMintingStatus('Minting in progress...');
     try {
       const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
-      const tx = await contract.mint(tokenURI, { gasLimit: 500000 });
+      const tx = await contract.mint(tokenURI, { gasLimit: 1000000 });
       await tx.wait();
       setMintingStatus('Minting successful!');
       if (onMinting) onMinting('Minting successful!');
