@@ -1,4 +1,5 @@
 // components/MintNFT.jsx
+"use client";
 
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
@@ -7,17 +8,18 @@ import contractAddress from '../artifacts/NFT_address.json';
 
 const MintNFT = ({ provider, signer }) => {
   const [tokenURI, setTokenURI] = useState('');
-  const [mintedTokenId, setMintedTokenId] = useState(null);
+  const [mintingStatus, setMintingStatus] = useState('');
 
   const mintNFT = async () => {
+    setMintingStatus('Minting in progress...'); // Initial status message
     try {
       const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
       const tx = await contract.mint(tokenURI);
       await tx.wait();
-      const tokenId = await contract.tokenCount();
-      setMintedTokenId(tokenId.toNumber());
+      setMintingStatus('Minting successful!'); // Success message
     } catch (error) {
       console.error('Minting error:', error);
+      setMintingStatus(`Minting failed: ${error.message}`); // Error message
     }
   };
 
@@ -33,9 +35,10 @@ const MintNFT = ({ provider, signer }) => {
       <button onClick={mintNFT} className="btn btn-primary">
         Mint NFT
       </button>
-      {mintedTokenId !== null && <p>Minted Token ID: {mintedTokenId}</p>}
+      <p>{mintingStatus}</p> {/* Display the minting status */}
     </div>
   );
 };
 
 export default MintNFT;
+erro
