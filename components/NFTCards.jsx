@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import NFTArtifact from '../artifacts/contracts/NFT.sol/NFT.json';
 import contractAddress from '../artifacts/NFT_address.json';
 
-const NFTCards = ({ provider }) => {
+const NFTCards = ({ provider, lastUpdate }) => {
   const [nfts, setNfts] = useState([]);
 
   useEffect(() => {
@@ -17,22 +17,26 @@ const NFTCards = ({ provider }) => {
 
       for (let i = 1; i <= totalSupply; i++) {
         const uri = await contract.tokenURI(i);
-        const response = await fetch(`https://ipfs.io/ipfs/${uri}`);
-        const metadata = await response.json();
+        try {
+          const response = await fetch(`https://ipfs.io/ipfs/${uri}`);
+          const metadata = await response.json();
 
-        items.push({
-          tokenId: i,
-          name: metadata.name,
-          image: metadata.image,
-          description: metadata.description
-        });
+          items.push({
+            tokenId: i,
+            name: metadata.name,
+            image: metadata.image,
+            description: metadata.description
+          });
+        } catch (error) {
+          console.error("Failed to fetch metadata:", error);
+        }
       }
 
       setNfts(items);
     };
 
     fetchNFTs();
-  }, [provider]);
+  }, [provider, lastUpdate]);  // Add `lastUpdate` here to trigger re-fetching when an NFT is minted
 
   return (
     <div className="grid grid-cols-3 gap-4 p-4">
