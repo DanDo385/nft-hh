@@ -1,4 +1,3 @@
-// components/NFTCards.jsx
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
@@ -17,8 +16,12 @@ const NFTCards = ({ provider, lastUpdate }) => {
 
       for (let i = 1; i <= totalSupply; i++) {
         const uri = await contract.tokenURI(i);
+        const formattedUri = uri.replace('ipfs://', '');
         try {
-          const response = await fetch(`https://ipfs.io/ipfs/${uri}`);
+          const response = await fetch(`https://ipfs.io/ipfs/${formattedUri}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
           const metadata = await response.json();
 
           items.push({
