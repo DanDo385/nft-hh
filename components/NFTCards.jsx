@@ -17,29 +17,37 @@ const NFTCards = ({ provider, lastUpdate }) => {
       for (let i = 1; i <= totalSupply; i++) {
         const uri = await contract.tokenURI(i);
         const formattedUri = uri.replace('ipfs://', '');
-        try {
-          const response = await fetch(`https://ipfs.io/ipfs/${formattedUri}`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          const metadata = await response.json();
+        const urls = [
+          `https://ipfs.io/ipfs/${formattedUri}`,
+          `https://cloudflare-ipfs.com/ipfs/${formattedUri}`
+        ];
 
-          items.push({
-            tokenId: i,
-            name: metadata.name,
-            image: metadata.image,
-            description: metadata.description
-          });
-        } catch (error) {
-          console.error("Failed to fetch metadata:", error);
+        for (const url of urls) {
+          try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const metadata = await response.json();
+
+            items.push({
+              tokenId: i,
+              name: metadata.name,
+              image: metadata.image,
+              description: metadata.description
+            });
+            break; // Break if successful
+          } catch (error) {
+            console.error(`Failed to fetch metadata from ${url}:`, error);
+            if (url === urls[urls.length - 1]) { // Last URL
+              console.error(`All fetch attempts failed for token ID ${i}:`, error);
+            }
+          }
         }
       }
-
       setNfts(items);
     };
 
     fetchNFTs();
-  }, [provider, lastUpdate]);  // Add `lastUpdate` here to trigger re-fetching when an NFT is minted
+  }, [provider, lastUpdate]);
 
   return (
     <div className="grid grid-cols-3 gap-4 p-4">
