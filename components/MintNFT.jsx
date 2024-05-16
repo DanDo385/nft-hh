@@ -46,7 +46,7 @@ const MintNFT = ({ provider, signer, onMinting }) => {
     try {
       const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
       console.log('Attempting to send mint transaction', { tokenURI });
-      const tx = await contract.mint(tokenURI, { gasLimit: 1000000 }); // Increased gas limit
+      const tx = await contract.mint(tokenURI, { gasLimit: 10000000 }); // Increased gas limit
       console.log('Transaction sent:', tx.hash);
       await tx.wait();
       console.log('Transaction confirmed on the blockchain');
