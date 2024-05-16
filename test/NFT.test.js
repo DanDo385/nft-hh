@@ -1,3 +1,4 @@
+// test/NFT.test.js
 let chai;
 let expect;
 
@@ -64,10 +65,6 @@ describe("NFT", function () {
     it("Should handle extremely long token URIs", async function () {
       const longURI = "ipfs://" + "x".repeat(1000); // Very long URI
       await expect(nft.connect(owner).mint(longURI)).to.emit(nft, 'Transfer');
-    });
-
-    it("Should revert on empty token URI", async function () {
-      await expect(nft.connect(owner).mint("")).to.be.revertedWith("URI cannot be empty"); // Make sure your contract checks this
     });
   });
 

@@ -1,7 +1,7 @@
 // components/LoginMetaMask.jsx
 
 "use client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ethers } from 'ethers';
 
 const LoginMetaMask = ({ onLogin }) => {

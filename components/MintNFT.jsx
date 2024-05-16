@@ -1,3 +1,4 @@
+//components/MintNFT.jsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -35,36 +36,58 @@ const MintNFT = ({ provider, signer, onMinting }) => {
       checkNetworkAndOwner();
     }
   }, [provider, signer]);
-
-  const mintNFT = async () => {
-    if (!isOwner) {
-      setMintingStatus('Only the owner can mint NFTs');
-      return;
-    }
-
-    setMintingStatus('Minting in progress...');
-    try {
-      const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
-      console.log('Attempting to send mint transaction', { tokenURI });
-      const tx = await contract.mint(tokenURI, { gasLimit: 10000000 }); // Increased gas limit
-      console.log('Transaction sent:', tx.hash);
-      await tx.wait();
-      console.log('Transaction confirmed on the blockchain');
-      setMintingStatus('Minting successful!');
-      if (onMinting) onMinting('Minting successful!');
-    } catch (error) {
-        console.error('Minting error:', error);
-        let errorMessage = 'Minting failed: Internal JSON-RPC error.';
-        if (error.data && error.data.message) {
-          errorMessage = `Minting failed: ${error.data.message}`;
-          console.error('Detailed RPC Error:', error.data.message);
-        } else if (error.message) {
-          errorMessage = `Minting failed: ${error.message}`;
-        }
-        setMintingStatus(errorMessage);
-        console.error('Detailed Error Message:', error);
+    const mintNFT = async () => {
+      if (!isOwner) {
+        setMintingStatus('Only the owner can mint NFTs');
+        return;
       }
-  };
+    
+      setMintingStatus('Minting in progress...');
+      try {
+        const contract = new ethers.Contract(contractAddress.address, NFTArtifact.abi, signer);
+    
+        // Manually fetch the nonce
+        const nonce = await provider.getTransactionCount(signer.getAddress(), 'latest');
+    
+        console.log('Attempting to send mint transaction', { tokenURI });
+        const tx = await contract.mint(tokenURI, { 
+          gasLimit: 10000000,
+          nonce: nonce  // Use the manually fetched nonce
+        });
+    
+        console.log('Transaction request:', tx);
+        tx.wait()
+        .then((receipt) => {
+          console.log('Transaction receipt:', receipt);
+          setMintingStatus('Minting successful!');
+          if (onMinting) onMinting('Minting successful!');
+        })
+        .catch((error) => {
+          console.error('Transaction error:', error);
+          let errorMessage = 'Minting failed: Transaction error.';
+          if (error.data && error.data.message) {
+            errorMessage = `Minting failed: ${error.data.message}`;
+            console.error('Detailed RPC Error:', error.data.message);
+          } else if (error.message) {
+            errorMessage = `Minting failed: ${error.message}`;
+          }
+          setMintingStatus(errorMessage);
+        });
+    
+      } catch (error) {
+          console.error('Minting error:', error);
+          let errorMessage = 'Minting failed: Internal JSON-RPC error.';
+          if (error.data && error.data.message) {
+            errorMessage = `Minting failed: ${error.data.message}`;
+            console.error('Detailed RPC Error:', error.data.message);
+          } else if (error.message) {
+            errorMessage = `Minting failed: ${error.message}`;
+          }
+          setMintingStatus(errorMessage);
+          console.error('Detailed Error Message:', error);
+      }
+    };
+    
 
   return (
     <div className="p-4 border rounded shadow">
