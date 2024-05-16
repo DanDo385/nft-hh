@@ -18,11 +18,8 @@ describe("NFT", function () {
   let addrs;
 
   beforeEach(async function () {
-    // Get the ContractFactory and Signers here.
     NFT = await ethers.getContractFactory("NFT");
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-
-    // Deploy a new contract before each test.
     nft = await NFT.deploy();
     await nft.deployed();
   });
@@ -89,6 +86,33 @@ describe("NFT", function () {
     it("Ownership should restrict minting after transfer", async function () {
       await nft.connect(owner).transferOwnership(addr1.address);
       await expect(nft.connect(owner).mint("ipfs://validCID")).to.be.revertedWith("Caller is not the owner");
+    });
+  });
+
+  describe("Network and JSON-RPC Tests", function () {
+    it("Should connect to the network", async function () {
+      const provider = ethers.provider;
+      const network = await provider.getNetwork();
+      console.log("Connected to network:", network.name, network.chainId);
+      expect(network).to.have.property('chainId');
+    });
+
+    it("Should get the latest block", async function () {
+      const provider = ethers.provider;
+      const block = await provider.getBlock("latest");
+      console.log("Latest block number:", block.number);
+      expect(block).to.have.property('number');
+    });
+
+    it("Should send a transaction and get transaction receipt", async function () {
+      const [sender] = await ethers.getSigners();
+      const tx = await sender.sendTransaction({
+        to: sender.address, // Sending ether to themselves just for testing
+        value: ethers.utils.parseEther("0.1"),
+      });
+      const receipt = await tx.wait();
+      console.log("Transaction successful with hash:", tx.hash);
+      expect(receipt).to.have.property('status', 1);
     });
   });
 });
