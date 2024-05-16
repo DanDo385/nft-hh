@@ -1,4 +1,3 @@
-// test/NFT.test.js
 let chai;
 let expect;
 
@@ -53,6 +52,26 @@ describe("NFT", function () {
     it("Should fail if non-owner tries to mint", async function () {
       await expect(nft.connect(addr1).mint("tokenURI1")).to.be.revertedWith("Caller is not the owner");
     });
+
+    it("Should mint successfully with explicit gas limit", async function () {
+      const mintTx = await nft.connect(owner).mint("ipfs://validCID", { gasLimit: 500000 });
+      await expect(mintTx.wait()).to.not.be.reverted;
+    });
+
+    it("Should estimate gas correctly", async function () {
+      const estimatedGas = await nft.connect(owner).estimateGas.mint("ipfs://validCID");
+      console.log(`Estimated Gas: ${estimatedGas}`);
+      expect(estimatedGas).to.be.below(500000, "Gas estimate is too high, possible issues in contract execution");
+    });
+
+    it("Should handle extremely long token URIs", async function () {
+      const longURI = "ipfs://" + "x".repeat(1000); // Very long URI
+      await expect(nft.connect(owner).mint(longURI)).to.emit(nft, 'Transfer');
+    });
+
+    it("Should revert on empty token URI", async function () {
+      await expect(nft.connect(owner).mint("")).to.be.revertedWith("URI cannot be empty"); // Make sure your contract checks this
+    });
   });
 
   describe("Ownership", function () {
@@ -65,6 +84,11 @@ describe("NFT", function () {
 
     it("Should prevent non-owners from transferring ownership", async function () {
       await expect(nft.connect(addr2).transferOwnership(addr1.address)).to.be.revertedWith("Caller is not the owner");
+    });
+
+    it("Ownership should restrict minting after transfer", async function () {
+      await nft.connect(owner).transferOwnership(addr1.address);
+      await expect(nft.connect(owner).mint("ipfs://validCID")).to.be.revertedWith("Caller is not the owner");
     });
   });
 });

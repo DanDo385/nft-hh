@@ -53,17 +53,17 @@ const MintNFT = ({ provider, signer, onMinting }) => {
       setMintingStatus('Minting successful!');
       if (onMinting) onMinting('Minting successful!');
     } catch (error) {
-      console.error('Minting error:', error);
-      let errorMessage = 'Minting failed: Internal JSON-RPC error.';
-      if (error.data && error.data.message) {
-        errorMessage = `Minting failed: ${error.data.message}`;
-        console.error('Detailed RPC Error:', error.data.message);
-      } else if (error.message) {
-        errorMessage = `Minting failed: ${error.message}`;
+        console.error('Minting error:', error);
+        let errorMessage = 'Minting failed: Internal JSON-RPC error.';
+        if (error.data && error.data.message) {
+          errorMessage = `Minting failed: ${error.data.message}`;
+          console.error('Detailed RPC Error:', error.data.message);
+        } else if (error.message) {
+          errorMessage = `Minting failed: ${error.message}`;
+        }
+        setMintingStatus(errorMessage);
+        console.error('Detailed Error Message:', error);
       }
-      setMintingStatus(errorMessage);
-      console.error('Detailed Error Message:', error);
-    }
   };
 
   return (
