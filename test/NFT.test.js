@@ -1,5 +1,9 @@
-const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const chai = require("chai");
+const { solidity } = require("ethereum-waffle");
+
+chai.use(solidity);
+const { expect } = chai;
 
 describe("NFT", function () {
   let NFT;
@@ -25,7 +29,8 @@ describe("NFT", function () {
     });
 
     it("Should have 0 tokens initially", async function () {
-      expect(await nft.tokenCount()).to.equal(0);
+      const tokenCount = await nft.tokenCount();
+      expect(tokenCount).to.equal(0);
     });
   });
 
@@ -34,7 +39,8 @@ describe("NFT", function () {
       const mintTx = await nft.connect(owner).mint("tokenURI1");
       await mintTx.wait();
 
-      expect(await nft.tokenCount()).to.equal(1);
+      const tokenCount = await nft.tokenCount();
+      expect(tokenCount).to.equal(1);
       expect(await nft.ownerOf(1)).to.equal(owner.address);
       expect(await nft.tokenURI(1)).to.equal("tokenURI1");
     });
