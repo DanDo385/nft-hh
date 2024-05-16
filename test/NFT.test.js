@@ -1,9 +1,14 @@
-const { ethers } = require("hardhat");
-const chai = require("chai");
-const { solidity } = require("ethereum-waffle");
+// Dynamically import chai at the top of your file
+let chai;
+let expect;
 
-chai.use(solidity);
-const { expect } = chai;
+before(async () => {
+  chai = await import('chai');
+  chai.use((await import('ethereum-waffle')).solidity);
+  expect = chai.expect;
+});
+
+const { ethers } = require("hardhat");
 
 describe("NFT", function () {
   let NFT;
