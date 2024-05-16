@@ -1,4 +1,4 @@
-// Dynamically import chai at the top of your file
+// test/NFT.test.js
 let chai;
 let expect;
 
