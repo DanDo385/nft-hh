@@ -4,6 +4,8 @@ import { ethers } from 'ethers';
 import NFTArtifact from '../artifacts/contracts/NFT.sol/NFT.json';
 import contractAddress from '../artifacts/NFT_address.json';
 
+const IPFS_GATEWAY = "https://ipfs.io/ipfs/";
+
 const NFTCards = ({ provider, lastUpdate }) => {
   const [nfts, setNfts] = useState([]);
 
@@ -16,21 +18,20 @@ const NFTCards = ({ provider, lastUpdate }) => {
 
       for (let i = 1; i <= totalSupply; i++) {
         const uri = await contract.tokenURI(i);
-        // Remove the 'ipfs://' prefix and ensure no double 'https://' or double 'ipfs.io/ipfs/'
         const formattedUri = uri.replace('ipfs://', '');
         try {
-          // Ensure we're using a valid and simple URL to access the IPFS gateway
-          const response = await fetch(`https://ipfs.io/ipfs/${formattedUri}`);
+          const response = await fetch(`${IPFS_GATEWAY}${formattedUri}`);
           if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}, URL: ${IPFS_GATEWAY}${formattedUri}`);
           }
           const metadata = await response.json();
+          const imageUrl = metadata.Image.replace('ipfs://', IPFS_GATEWAY);
 
           items.push({
             tokenId: i,
-            name: metadata.name,
-            image: metadata.image,
-            description: metadata.description
+            name: metadata.Name,  // Adjusted for case sensitivity
+            image: imageUrl,      // Properly formatted to be a valid URL
+            description: metadata.Description // Adjusted for case sensitivity
           });
         } catch (error) {
           console.error(`Failed to fetch metadata for token ID ${i}:`, error);
